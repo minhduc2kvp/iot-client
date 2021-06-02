@@ -1,38 +1,55 @@
-.App {
-  text-align: center;
+body, html {
+    height: 100%;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+#root {
+    height: 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.full-width {
+    width: 100%;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.full-height {
+    height: 100%;
 }
 
-.App-link {
-  color: #61dafb;
+.bg-nav-home {
+    background: rgba(148,187,233,1);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.bg-home {
+    background: linear-gradient(90deg, rgba(148,187,233,1) 14%, rgba(238,174,202,1) 100%)!important;
+}
+
+.bg-main {
+    background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)!important;
+}
+
+.btn-custom {
+    width: 100%;
+    background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)!important;
+}
+
+.btn-custom:hover {
+    color: white;
+}
+
+.btn-nav {
+    width: 80%;
+    color: white;
+    background: rgb(113, 166, 226);
+}
+
+.btn-nav:hover {
+    background-color: rgb(77, 145, 223);
+}
+
+.avatar {
+    width: 40%;
+    height: fit-content;
+}
+
+.input-width {
+    width: 75px!important;
 }

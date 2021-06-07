@@ -1,14 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import Switch from 'react-switch';
+import { Switch, TextField } from '@material-ui/core';
 import call_api from '../services/request';
 import SensorChart from './SensorChart';
+import { HiLightBulb } from 'react-icons/hi';
+import { WiHumidity } from 'react-icons/wi';
+import { FaTemperatureHigh } from 'react-icons/fa';
+import { AiOutlineWarning } from 'react-icons/ai';
 
+
+const TIME_INTERVAL = 1000 * 15;
+
+function DHT11SensorBox({ data }) {
+    return (
+        <div className="p-2 border rounded shadow">
+            <h6><WiHumidity color='#2196f3' /> Humidity</h6>
+            <h6 className="pl-3 text-primary">{data ? data[1].toFixed(2) : ''} %</h6>
+            <h6><FaTemperatureHigh color='#e53935' /> Temperature</h6>
+            <h6 className="pl-3 text-danger">{data ? data[2].toFixed(2) : ''} °C</h6>
+        </div>
+    );
+}
 
 function LedSensorBox({ handle, checked }) {
     return (
-        <div className="full-height pt-5 border rounded shadow d-flex justify-content-around">
-            <h4 >Led</h4>
-            <Switch onChange={handle} checked={checked} />
+        <div className="mt-4 p-3 border rounded shadow d-flex">
+            <HiLightBulb color={checked ? '#ffc400' : 'gray'} size='2em' />
+            <Switch className="ml-auto" onChange={handle} checked={checked} />
         </div>
     );
 }
@@ -32,19 +49,43 @@ function SoundSensorBox({ handle, data }) {
     };
 
     return (
-        <div className="full-height border rounded p-2 shadow">
+        <div className="border rounded p-2 shadow">
             <div className="full-width d-flex">
-                <h5 className="ml-4">Sound</h5>
-                <h5 className="ml-auto mr-5">{data?.value}</h5>
+                <h6 className="ml-1">Sound</h6>
+                <h6 className="ml-auto mr-1">{data?.value?.toFixed(2)}</h6>
             </div>
             <div className="full-width d-flex mt-2">
-                <h5 className="ml-4">Auto</h5>
-                <Switch className="ml-auto mr-5" onChange={handleChangeAuto} checked={data?.auto} />
+                <h6 className="ml-1">Auto</h6>
+                <Switch className="ml-auto mr-1" size='small' onChange={handleChangeAuto} checked={data?.auto} />
             </div>
-            <div className="full-width d-flex mt-2">
-                <h5 className="ml-4">Range</h5>
-                <input type="number" className="ml-4 input-width" onChange={handleChangeMaxRange} value={data?.max_range} />
-                <input type="number" className="ml-auto mr-5 input-width" onChange={handleChangeMinRange} value={data?.min_range} />
+            <h6 className="ml-1 mt-3 text-uppercase">range for auto</h6>
+            <div className="full-width d-flex mt-3">
+                <TextField
+                    label="Max range"
+                    type="number"
+                    size='small'
+                    value={data?.max_range}
+                    onChange={handleChangeMaxRange}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    color='secondary'
+                    variant="outlined"
+                />
+            </div>
+            <div className="full-width d-flex mt-3">
+                <TextField
+                    label="Min range"
+                    type="number"
+                    size='small'
+                    value={data?.min_range}
+                    onChange={handleChangeMinRange}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    color='secondary'
+                    variant="outlined"
+                />
             </div>
         </div>
     );
@@ -52,19 +93,18 @@ function SoundSensorBox({ handle, data }) {
 
 function MQ5SensorBox({ data }) {
 
-    const status = data?.value > data?.danger ? "danger" : (data?.value > data?.warning ? "warning" : "safe")
+    const status = data?.value > data?.danger ? "danger" : (data?.value > data?.warning ? "warning" : "safe");
+    const style = status === "safe" ? "success" : status; 
 
     return (
-        <div className={"full-height border rounded shadow border-" + status}>
-            <h3 className="mt-2 ml-2">Gas Sensor</h3>
-            <div className="full-width d-flex mt-3">
-                <h5 className="ml-4">Value</h5>
-                <h5 className="ml-auto mr-5">{data?.value}</h5>
-            </div>
-            <div className="full-width d-flex">
-                <h4 className="ml-4">Status</h4>
-                <h4 className={"ml-auto mr-5 text-uppercase text-" + status}>{status}</h4>
-            </div>
+        <div className={"full-width mt-2 p-2 border rounded shadow border-" + style}>
+            <h6 className="text-center text-uppercase">gas emissions</h6>
+            <h6 className="text-center">{data?.value?.toFixed(2)}</h6>
+            <h6 className={"text-center text-uppercase text-" + style}>
+                {status !== 'safe' ? <AiOutlineWarning /> : ''}
+                {status}
+                {status !== 'safe' ? <AiOutlineWarning /> : ''}
+            </h6>
         </div>
     );
 }
@@ -73,9 +113,9 @@ function MQ5SensorBox({ data }) {
 function HomeMain() {
 
     const [dataChart, setDataChart] = useState([]);
-    const [dataLed, setDataLed] = useState();
+    const [dataLed, setDataLed] = useState({ data: { status: false } });
     const [dataMQ5, setDataMQ5] = useState();
-    const [dataSound, setDataSound] = useState();
+    const [dataSound, setDataSound] = useState({ data: { auto: false } });
 
     async function getDataSensor() {
         const res = await call_api({
@@ -129,21 +169,28 @@ function HomeMain() {
         getDataSensor();
         setInterval(async () => {
             await getDataSensor();
-        }, 1000);
+        }, TIME_INTERVAL);
     }, []);
 
     return (
-        <div className="p-2">
-            <SensorChart data={dataChart} />
+        <div className="container mt-2">
             <div className="row">
-                <div className="ml-5 col-3">
-                    <LedSensorBox handle={handleChangeLedStatus} checked={dataLed?.data.status} />
+                <div className="col-lg-8">
+                    <SensorChart data={dataChart} />
                 </div>
-                <div className="col-4">
-                    <SoundSensorBox handle={handleChangeSoundData} data={dataSound?.data} />
-                </div>
-                <div className="col-4">
-                    <MQ5SensorBox data={dataMQ5?.data}/>
+                <div className="col-lg-4">
+                    <div className="row">
+                        <div className="col-md-6">
+                            <DHT11SensorBox data={dataChart[dataChart.length - 1]} />
+                            <LedSensorBox handle={handleChangeLedStatus} checked={dataLed?.data?.status} />
+                        </div>
+                        <div className="col-md-6">
+                            <SoundSensorBox handle={handleChangeSoundData} data={dataSound?.data} />
+                        </div>
+                        <div className="col-12">
+                            <MQ5SensorBox data={dataMQ5?.data} />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

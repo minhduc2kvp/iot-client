@@ -6,8 +6,8 @@ function Login() {
 
     return (
         <div className="row">
-            <FormLogin />
             <Banner />
+            <FormLogin />
         </div>
     );
 }

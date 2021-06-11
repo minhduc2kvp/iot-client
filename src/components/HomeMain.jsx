@@ -6,9 +6,16 @@ import { HiLightBulb } from 'react-icons/hi';
 import { WiHumidity } from 'react-icons/wi';
 import { FaTemperatureHigh } from 'react-icons/fa';
 import { AiOutlineWarning } from 'react-icons/ai';
-
+import { makeStyles, Backdrop, CircularProgress } from '@material-ui/core';
 
 const TIME_INTERVAL = 1000 * 15;
+
+const useStyles = makeStyles((theme) => ({
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
+    },
+}));
 
 function DHT11SensorBox({ data }) {
     return (
@@ -94,7 +101,7 @@ function SoundSensorBox({ handle, data }) {
 function MQ5SensorBox({ data }) {
 
     const status = data?.value > data?.danger ? "danger" : (data?.value > data?.warning ? "warning" : "safe");
-    const style = status === "safe" ? "success" : status; 
+    const style = status === "safe" ? "success" : status;
 
     return (
         <div className={"full-width mt-2 p-2 border rounded shadow border-" + style}>
@@ -111,7 +118,11 @@ function MQ5SensorBox({ data }) {
 
 
 function HomeMain() {
-
+    const classes = useStyles();
+    const [open, setOpen] = useState(false);
+    const handleClose = () => {
+        setOpen(false);
+    };
     const [dataChart, setDataChart] = useState([]);
     const [dataLed, setDataLed] = useState({ data: { status: false } });
     const [dataMQ5, setDataMQ5] = useState();
@@ -143,6 +154,7 @@ function HomeMain() {
                 data: data.data
             }
         });
+        console.log(res);
     }
 
     function handleChangeLedStatus() {
@@ -165,8 +177,11 @@ function HomeMain() {
         updateDataSensor(dataUpdate);
     };
 
-    useEffect(() => {
-        getDataSensor();
+    useEffect(async () => {
+        setOpen(true);
+        await getDataSensor();
+        setOpen(false);
+
         setInterval(async () => {
             await getDataSensor();
         }, TIME_INTERVAL);
@@ -174,6 +189,9 @@ function HomeMain() {
 
     return (
         <div className="container mt-2">
+            <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
             <div className="row">
                 <div className="col-lg-8">
                     <SensorChart data={dataChart} />

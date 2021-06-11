@@ -1,10 +1,23 @@
 import React, { useState } from 'react';
+import { TextField, Grid, Snackbar, Slide } from '@material-ui/core';
+import { BiUserCircle } from 'react-icons/bi';
+import { CgPassword } from 'react-icons/cg';
 import call_api from '../services/request';
+
+
+function SlideTransition(props) {
+    return <Slide {...props} direction="up" />;
+}
 
 function FormLogin() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [open, setOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const handleClose = (reason) => {
+        setOpen(false);
+    };
 
     async function login() {
         const res = await call_api({
@@ -23,7 +36,8 @@ function FormLogin() {
             localStorage.setItem('user', data.data?.username);
             window.location = '/';
         } else {
-            setError(data.data)
+            setErrorMessage(data.data);
+            setOpen(true);
         }
     }
 
@@ -32,16 +46,45 @@ function FormLogin() {
             <div className="container d-flex justify-content-center align-items-center full-height">
                 <form className="shadow border rounded col-md-7 bg-white p-4 mb-3 mt-3">
                     <h2>Sign in</h2>
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" value={username} onChange={(e) => setUsername(e.target.value)} name="username" placeholder="Enter username" />
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" value={password} onChange={(e) => setPassword(e.target.value)} name="password" placeholder="Enter Password" />
-                    </div>
-                    {error && <span className="d-block mb-3 badge badge-danger">{error}</span>}
-                    <button type="button" onClick={login} class="btn btn-custom">Login</button>
+                    <Grid container alignItems="flex-end">
+                        <Grid item xs={2}>
+                            <BiUserCircle size="1.5em" color="#ef9a9a" />
+                        </Grid>
+                        <Grid item xs={10}>
+                            <TextField
+                                label="username"
+                                fullWidth
+                                value={username}
+                                color="secondary"
+                                onChange={(e) => setUsername(e.target.value)} />
+                        </Grid>
+                    </Grid>
+                    <Grid className="mt-2" container alignItems="flex-end">
+                        <Grid item xs={2}>
+                            <CgPassword size="1.5em" color="#ef9a9a" />
+                        </Grid>
+                        <Grid item xs={10}>
+                            <TextField
+                                type="password"
+                                label="password"
+                                value={password}
+                                fullWidth
+                                color="secondary"
+                                onChange={(e) => setPassword(e.target.value)} />
+                        </Grid>
+                    </Grid>
+                    <Snackbar
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                        TransitionComponent={SlideTransition}
+                        open={open}
+                        autoHideDuration={3000}
+                        onClose={handleClose}
+                        message={errorMessage}
+                    />
+                    <button type="button" onClick={login} class="mt-4 btn btn-custom">Login</button>
                 </form>
             </div>
         </div>

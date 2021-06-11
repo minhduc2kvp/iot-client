@@ -1,7 +1,7 @@
 import './App.css';
 import Home from './pages/Home/Home';
 import Login from './pages/Login/Login';
-import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import { createContext, useContext } from 'react';
 import auth from "./services/auth";
 

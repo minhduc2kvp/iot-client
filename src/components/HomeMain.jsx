@@ -8,7 +8,7 @@ import { FaTemperatureHigh } from 'react-icons/fa';
 import { AiOutlineWarning } from 'react-icons/ai';
 import { makeStyles, Backdrop, CircularProgress } from '@material-ui/core';
 
-const TIME_INTERVAL = 1000 * 15;
+const TIME_INTERVAL = 1000 * 10;
 
 const useStyles = makeStyles((theme) => ({
     backdrop: {
@@ -134,7 +134,9 @@ function HomeMain() {
             url: '/sensor'
         });
 
-        const [led, dht11, mq5, sound] = res.data.data;
+        console.log(res.data.data);
+
+        const [dht11, led, mq5, sound] = res.data.data;
         setDataLed(led);
         setDataMQ5(mq5);
         setDataSound(sound);
